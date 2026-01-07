@@ -21,8 +21,10 @@ import { mainGenieRoute, ChatNew, SubRoutes } from '../routeList';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { groupByDate } from './dateHelpers';
 import { ChatHistorySearch } from './ChatHistorySearch';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { getConversationsFromAPI } from '../getFromAPI';
 
 /**
  * Filters conversations by search term (case-insensitive, matches anywhere in title)
@@ -130,6 +132,17 @@ export const ChatHistory: React.FC = () => {
   const { t } = useTranslation('plugin__genie-web-client');
 
   const [searchTerm, setSearchTerm] = useState<string>('');
+
+  /* *************** TESTING START *************** */
+  useEffect(() => {
+    const fetchConversations = async () => {
+      const conversationsFromAPI = await getConversationsFromAPI();
+      console.log('KKD CONVERSATION HISTORY from API', conversationsFromAPI.conversations);
+      console.log('KKD CONVERSATION HISTORY from AI state', conversations);
+    };
+    fetchConversations();
+  }, []);
+  /* *************** TESTING END *************** */
 
   const allConversations = (conversations as unknown as Conversation[]) || [];
   const filteredConversations = useMemo(

@@ -48,7 +48,8 @@ const consoleFetchWithCSRF = (input: RequestInfo, init?: RequestInit): Promise<R
 
 // Initialize state manager outside React scope
 const client = new OLSClient({
-  baseUrl: `${window.location.origin}/api/proxy/plugin/genie-web-client/ols/`, // Always use bridge proxy
+  baseUrl: 'http://localhost:8080',
+  // baseUrl: `${window.location.origin}/api/proxy/plugin/genie-web-client/ols/`, // Always use bridge proxy
   fetchFunction: consoleFetchWithCSRF,
 });
 

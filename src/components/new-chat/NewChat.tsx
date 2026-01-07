@@ -17,7 +17,12 @@ import {
 } from '@patternfly/react-icons';
 import { MessageBar } from '@patternfly/chatbot';
 import { mainGenieRoute, SubRoutes } from '../routeList';
-import { useSendMessage } from '@redhat-cloud-services/ai-react-state';
+import {
+  useSendMessage,
+  useSetActiveConversation,
+  useCreateNewConversation,
+  useActiveConversation,
+} from '@redhat-cloud-services/ai-react-state';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { buildQuickResponsesPayload, getIntroPromptKey } from './suggestions';
 import { useChatBar } from '../ChatBarContext';
@@ -28,6 +33,9 @@ export const NewChat = () => {
   const [userName, setUserName] = useState<string>('');
   const sendMessage = useSendMessage();
   const navigate = useNavigate();
+  const setActiveConversation = useSetActiveConversation();
+  const createNewConversation = useCreateNewConversation();
+  const activeConversation = useActiveConversation();
 
   setShowChatBar(false);
 
@@ -41,6 +49,21 @@ export const NewChat = () => {
       // local storage not available
     }
   }, []);
+
+  useEffect(() => {
+    const initializeConversation = async () => {
+      /* *************** TESTING START *************** */
+      console.log('KKD ACTIVE CONVERSATION', activeConversation);
+      /* *************** TESTING END *************** */
+      const { id } = await createNewConversation();
+      setActiveConversation(id);
+
+      /* *************** TESTING START *************** */
+      console.log('KKD NEW CONVERSATION ID from AI state', id);
+      /* *************** TESTING END *************** */
+    };
+    initializeConversation();
+  }, [createNewConversation, setActiveConversation]);
 
   const titleText = userName
     ? t('newChat.heading', { name: userName })

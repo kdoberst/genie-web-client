@@ -3,6 +3,7 @@ import {
   useMessages,
   useSendMessage,
   useSetActiveConversation,
+  useActiveConversation,
 } from '@redhat-cloud-services/ai-react-state';
 import {
   Chatbot,
@@ -25,24 +26,39 @@ import { useChatBar } from '../ChatBarContext';
 import './Chat.css';
 import { useTranslation } from 'react-i18next';
 import { toMessageQuickResponses } from '../new-chat/suggestions';
+import { getConversationFromAPI } from '../getFromAPI';
 
 export const Chat: React.FunctionComponent = () => {
   const bottomRef = React.createRef<HTMLDivElement>();
   const messages = useMessages();
   const { conversationId } = useParams();
   const setActiveConversation = useSetActiveConversation();
+  const activeConversation = useActiveConversation();
   const sendMessage = useSendMessage();
   const [isLoading, setIsLoading] = useState(false);
   const [isValidConversationId, setIsValidConversationId] = useState(true);
   const { setShowChatBar } = useChatBar();
   const { t } = useTranslation('plugin__genie-web-client');
+
+  const [messagesFromAPI, setMessagesFromAPI] = useState([]);
   useEffect(() => {
     if (conversationId) {
       const setConversation = async () => {
         setIsLoading(true);
+
         try {
+          /* *************** TESTING START *************** */
+          console.log('KKD ACTIVE CONVERSATION', activeConversation);
+          await getConversationFromAPI(conversationId).then((data) => {
+            setMessagesFromAPI(data);
+          });
+          /* *************** TESTING END *************** */
           await setActiveConversation(conversationId);
           setIsValidConversationId(true);
+          /* *************** TESTING START *************** */
+          console.log('KKD SET ACTIVE CONVERSATION TO', conversationId);
+          console.log('KKD ACTIVE CONVERSATION', activeConversation);
+          /* *************** TESTING END *************** */
         } catch (error) {
           setIsValidConversationId(false);
         } finally {
@@ -57,6 +73,15 @@ export const Chat: React.FunctionComponent = () => {
   useEffect(() => {
     setShowChatBar(isValidConversationId);
   }, [isValidConversationId, setShowChatBar]);
+
+  useEffect(() => {
+    /* *************** TESTING START *************** */
+    console.log('KKD MESSAGES from Conversation ID (from URL)', conversationId);
+    console.log('KKD MESSAGES from Conversation (from AI State)', activeConversation);
+    console.log('KKD MESSAGES from AI STATE', messages);
+    console.log('KKD MESSAGES from API', messagesFromAPI);
+    /* *************** TESTING END *************** */
+  }, [messages]);
 
   // Convert Red Hat Cloud Services messages to PatternFly format
   const formatMessages = () => {
